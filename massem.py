@@ -97,7 +97,7 @@ Opcode = {
 Label = {}  # declare Hash of label -> PC values as a dictionary
 Mcode = {}  # declare Machine code for each PC value as the Key of this dictionary
 Origline = {}   # declare Original line as an dictionary
-Ltype = []  # Type of label? undef is not, 1 is abs, 2 is rel
+Ltype = {}  # Type of label? undef is not, 1 is abs, 2 is rel
 PC=0        # Current program counter
 
 
@@ -113,6 +113,8 @@ def pre_process(contents):
     lines = contents.split("\n") # return a list of strings, splited by "\n" in previous file
     p = re.compile('(\s*#.*)')  # regular expression object for finding comments
     labelRegEx = re.compile('(.*):\s+(.*)') # regular expression object for finding labels
+    ldt = re.compile('^\D*') # regular expression for finding 'leading text'
+    hexa = re.compile('^0x') # regular expression for judjing 'hexadecimal'
     
     for line in lines:
         #print line
@@ -152,17 +154,18 @@ def pre_process(contents):
                 print "The opcode is invalid"
             
             opcode = opcode_arg_list[0]
+            print 'the opcode is:', opcode
     
             # now the 'opcode_arg_list' is in the form of '['li', 'r1, 100']'
             # Fill in the opcode of the machine instruction
             Mcode[PC] = Opcode[opcode][0] << 9 # shift 3 regs
                 
-            # Run any code associated with this instruction
+            # Run any code associated with this instruction [i think it makes no sense to run 'eval' here]
             # eval($Opcode{$opcode}->[2]) if (defined($Opcode{$opcode}->[2]));
             
             # Get the arguments as a list
             arg_string = opcode_arg_list[1]
-            arg_list = re.split(',\s*', arg_string, 1)
+            arg_list = re.split(',\s*', arg_string)
             print 'the argument list is:', arg_list
             
             # Check if the number of arguments is correct
@@ -174,8 +177,124 @@ def pre_process(contents):
             
         # start from here:
             # Process the arguments
-            
-            
+            args = list(Opcode[opcode][1])
+            for arg_type in args:
+                arg = arg_list.pop(0)
+                
+                # D-reg:
+                if arg_type is 'd':
+                    # Lose leading text
+                    matches = ldt.search(arg)
+                    if matches:
+                        arg = arg[matches.end():] # from the end of leading text to the end of original string
+                        arg = int(arg)            # convert the string to int for later calculating
+                    Mcode[PC] += (arg & 7)
+                    print arg
+                    print Mcode[PC]
+                # D-reg, S-reg is D-reg
+                elif arg_type is 'D':
+                    # Lose leading text
+                    matches = ldt.search(arg)
+                    if matches:
+                        arg = arg[matches.end():] # from the end of leading text to the end of original string
+                        arg = int(arg)            # convert the string to int for later calculating
+                    Mcode[PC] += (arg & 7)
+                    Mcode[PC] += (arg & 7) << 3
+                    print arg
+                    print Mcode[PC]
+                # S-reg
+                elif arg_type is 's':
+                    # Lose leading text
+                    matches = ldt.search(arg)
+                    if matches:
+                        arg = arg[matches.end():] # from the end of leading text to the end of original string
+                        arg = int(arg)            # convert the string to int for later calculating
+                    Mcode[PC] += (arg & 7)
+                # T-reg
+                elif arg_type is 't':
+                    # Lose leading text
+                    matches = ldt.search(arg)
+                    if matches:
+                        arg = arg[matches.end():] # from the end of leading text to the end of original string
+                        arg = int(arg)            # convert the string to int for later calculating
+                    Mcode[PC] += (arg & 7) << 6
+                # Absolute immediate
+                elif arg_type is 'i':
+                    # Deal with hex values - judge if the value arg is a hex by looking if it is start with '0x'
+                    matches = hexa.search(arg)
+                    if matches:
+                        arg = arg[matches.end():]
+                        arg = int(arg)
+                        arg = hex(arg) # hex in python is 'type str'
+                    # Simply bump up the PC and save the value for now
+                    PC += 1
+                    Mcode[PC] = arg
+                    Ltype[PC] = 1
+                # Relative immediate
+                elif arg_type is 'I':
+                    # Deal with hex values - judge if the value arg is a hex by looking if it is start with '0x'
+                    matches = hexa.search(arg)
+                    if matches:
+                        arg = arg[matches.end():]
+                        arg = int(arg)
+                        # if the below function dose not work, then try "format(number, '02x')"
+                        arg = hex(arg) # hex in python is 'type str'
+                    # Simply bump up the PC and save the value for now
+                    PC += 1
+                    Mcode[PC] = arg
+                    Ltype[PC] = 2
+                    
+                # Indexed addressing. We want to allow these types of argument:
+                # (Rn) where immed=0, immed(Rn), Rn(immed) and immed can be
+                # numeric or a label and Rn is the s-reg
+                elif arg_type is 'X':
+                    # regex for finding arguments as below:
+                    regnum = None
+                    immed = None
+                    match_arg_1 = re.compile('(\S*)\([Rr](\d+)\)')
+                    match_arg_2 = re.compile('[Rr](\d+)\((\S+)\)')
+                    matches_1 = match_arg_1.search(arg)
+                    matches_2 = match_arg_2.search(arg)
+                    if matches_1:
+                        immed = 1
+                        regnum = 2
+                    elif matches_2:
+                        immed = 2
+                        regnum = 1
+                        
+                    # check if regnum has been changed
+                    try:
+                        regnum == None
+                    except ValueError:
+                        print "Bad indexed addressing"
+                    
+                    if immed == None:
+                        immed = 0
+                    
+                    match_immed = hexa.search(immed)
+                    if match_immed:
+                        immed = immed[match_immed.end():]
+                        immed = int(immed)
+                        immed = hex(immed)
+                    Mcode[PC] += (regnum & 7) << 3
+                    
+                    PC += 1
+                    Mcode[PC] = immed
+                    Ltype[PC] = 1
+                    
+                # Register indexed addressing. We want to see Rs(Rt) only.
+                elif arg_type is 'S':
+                    sreg = None
+                    treg = None
+                    match_arg = re.compile('[Rr](\d+)\([Rr](\d+)\)')
+                    matches = match_arg.search(arg)
+                    if matches:
+                        sreg = 1
+                        treg = 2
+                    else:
+                        sys.exit('Bad indexed arg')
+                    Mcode[PC] += (sreg & 7) << 3
+                    Mcode[PC] += (treg & 7) << 6
             # at the end of each loop for parsing the lines, add 1 to PC value
             PC += 1        
             
