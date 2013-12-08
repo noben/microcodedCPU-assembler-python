@@ -1,11 +1,14 @@
 #   read in a text file of assembling language and then parse it to machine code
-#   regular expressions
+
+# ----------------------------------------------------------------------------------------------------------------
+# Question: what is the type of arguements (ex. 'arg' at line 195) should be before it is inserted into Mcode[PC]?
+# ----------------------------------------------------------------------------------------------------------------
+
 import re
 import sys
 
 #   Table of opcode names, the values and their arguments
 #   A hash table implemented with dictionary
-
 Opcode = {
 	'add':  [ 0, 'dst'  ],
 	'sub':  [ 1, 'dst'  ],
@@ -119,7 +122,6 @@ def pre_process(contents):
     for line in lines:
         #print line
         line = line.strip() # take off spaces around a line
-        
         matches = p.search(line)
         
         if matches:
@@ -158,6 +160,7 @@ def pre_process(contents):
     
             # now the 'opcode_arg_list' is in the form of '['li', 'r1, 100']'
             # Fill in the opcode of the machine instruction
+            print "---------the type of opcode is-------------:", type(opcode)
             Mcode[PC] = Opcode[opcode][0] << 9 # shift 3 regs
                 
             # Run any code associated with this instruction [i think it makes no sense to run 'eval' here]
@@ -188,8 +191,6 @@ def pre_process(contents):
                         arg = arg[matches.end():] # from the end of leading text to the end of original string
                         arg = int(arg)            # convert the string to int for later calculating
                     Mcode[PC] += (arg & 7)
-                    print arg
-                    print Mcode[PC]
                 # D-reg, S-reg is D-reg
                 elif arg_type is 'D':
                     # Lose leading text
@@ -199,8 +200,6 @@ def pre_process(contents):
                         arg = int(arg)            # convert the string to int for later calculating
                     Mcode[PC] += (arg & 7)
                     Mcode[PC] += (arg & 7) << 3
-                    print arg
-                    print Mcode[PC]
                 # S-reg
                 elif arg_type is 's':
                     # Lose leading text
@@ -317,6 +316,29 @@ def pre_process(contents):
 # print machine code in hex for now
     for i in range(0, len(Mcode)):
         print "%04x: %08x \t%s" %(i, Mcode[i], Origline[i] if i in Origline else "")
+    
+# create and write to a file
+    print "Writing to '.ram' file..."
+    file = open('program_luming.ram', 'w+') # 'w+', cover the original file
+    
+    file.write('The machine code:\n')
+    for i in range(0, len(Mcode)):
+    	# assign the value of Mcode to 'M_code' which is to be output
+        M_code = Mcode[i]
+        # the number of bits in the format may be needed to be modified:
+        print 'the type of this Mcode is:', type(M_code)
+        print 'the Mcode is:', Mcode
+        print 'i == ', i
+        # use buffer here to convert M_code into hexadecimal number
+        buf = "%04x" %(M_code)
+        # Mcode = format(Mcode, '04x')
+        file.write(buf+' ')
+        if i%8 == 7:
+            file.write('\n')
+        
+    file.write('\n')
+    file.close()
+    print "Writing to file complished."
     
 #   input file from command line
 #   open and read the input file which is the assembling language
