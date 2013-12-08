@@ -175,7 +175,6 @@ def pre_process(contents):
             except ValueError:
                 print "The number of arguments is invalid"
             
-        # start from here:
             # Process the arguments
             args = list(Opcode[opcode][1])
             for arg_type in args:
@@ -223,9 +222,7 @@ def pre_process(contents):
                     # Deal with hex values - judge if the value arg is a hex by looking if it is start with '0x'
                     matches = hexa.search(arg)
                     if matches:
-                        arg = arg[matches.end():]
-                        arg = int(arg)
-                        arg = hex(arg) # hex in python is 'type str'
+                        arg = int(arg, 16) # convert the hex to int
                     # Simply bump up the PC and save the value for now
                     PC += 1
                     Mcode[PC] = arg
@@ -235,10 +232,7 @@ def pre_process(contents):
                     # Deal with hex values - judge if the value arg is a hex by looking if it is start with '0x'
                     matches = hexa.search(arg)
                     if matches:
-                        arg = arg[matches.end():]
-                        arg = int(arg)
-                        # if the below function dose not work, then try "format(number, '02x')"
-                        arg = hex(arg) # hex in python is 'type str'
+                        arg = int(arg, 16) # convert the hex to int
                     # Simply bump up the PC and save the value for now
                     PC += 1
                     Mcode[PC] = arg
@@ -256,28 +250,26 @@ def pre_process(contents):
                     matches_1 = match_arg_1.search(arg)
                     matches_2 = match_arg_2.search(arg)
                     if matches_1:
-                        immed = 1
-                        regnum = 2
+                        immed = matches_1.group(1)
+                        regnum = matches_1.group(2)
                     elif matches_2:
-                        immed = 2
-                        regnum = 1
+                        immed = matches_2.group(2)
+                        regnum = matches_2.group(1)
                         
                     # check if regnum has been changed
                     try:
-                        regnum == None
+                        regnum is not None
                     except ValueError:
                         print "Bad indexed addressing"
-                    
-                    if immed == None:
+                    # question here, how could immed be ""?
+                    if immed == "":
                         immed = 0
                     
                     match_immed = hexa.search(immed)
                     if match_immed:
-                        immed = immed[match_immed.end():]
-                        immed = int(immed)
-                        immed = hex(immed)
+                        immed = int(immed, 16)
+                        
                     Mcode[PC] += (regnum & 7) << 3
-                    
                     PC += 1
                     Mcode[PC] = immed
                     Ltype[PC] = 1
@@ -289,8 +281,8 @@ def pre_process(contents):
                     match_arg = re.compile('[Rr](\d+)\([Rr](\d+)\)')
                     matches = match_arg.search(arg)
                     if matches:
-                        sreg = 1
-                        treg = 2
+                        sreg = matches.group(1)
+                        treg = matches.group(2)
                     else:
                         sys.exit('Bad indexed arg')
                     Mcode[PC] += (sreg & 7) << 3
@@ -299,7 +291,32 @@ def pre_process(contents):
             PC += 1        
             
     
-    
+# Time to backpatch the label values in the machine code
+# Currently, this piece of code is included in process() function
+    for i in range(0, len(Mcode)):
+        if i not in Ltype:
+            continue
+        # Get the label's value, lookup if not numeric:
+        # optional leading - sign, followed by 1 or more digits
+        label = Mcode[i]
+        label_match = re.compile('^-?\d+$')
+        matches = label_match.search(label)
+        if not matches:
+            try:
+                label in Label
+            except ValueError:
+                print "Undefined label:", label
+            label = Label[label]
+        # Calculate absolute value if it is relative
+        if Ltype[i] == 2:
+            label = label - i
+        # Save the final value:
+        label = int(label)
+        Mcode[i] = label & 0xffff
+        
+# print machine code in hex for now
+    for i in range(0, len(Mcode)):
+        print "%04x: %08x \t%s" %(i, Mcode[i], Origline[i] if i in Origline else "")
     
 #   input file from command line
 #   open and read the input file which is the assembling language
