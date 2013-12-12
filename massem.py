@@ -72,10 +72,10 @@ Opcode = {
     #   the below code need to be modified
 	#   'jsr':  [ 59, 'i',	'$Mcode[$PC]+= 7<<3; # sp' ],
     #   modify above code as below: 
-    'jsr':  [ 59, 'i',	'$Mcode[$PC]+= 7<<3; # sp' ],
+    'jsr':  [ 59, 'i',	'Mcode[PC]+= 7<<3; # sp' ],
 	#   'rts':  [ 60, '', 	'$Mcode[$PC]+= 7<<3; # sp' ],
     #   modify above code as below: 
-    'rts':  [ 60, '', 	'$Mcode[$PC]+= 7<<3; # sp' ],
+    'rts':  [ 60, '', 	'Mcode[PC]+= 7<<3; # sp' ],
 	'inc':  [ 61, 's'   ],
 	'dec':  [ 62, 's'   ],
 	'li':   [ 63, 'di'  ],
@@ -86,10 +86,10 @@ Opcode = {
     #   the below code need to be modified
 	#'push': [ 68, 'd',	'$Mcode[$PC]+= 7<<3; # sp' ],
     #   modify above code as below:
-    'push': [ 68, 'd',	'$Mcode[$PC]+= 7<<3; # sp' ],
+    'push': [ 68, 'd',	'Mcode[PC]+= 7<<3; # sp' ],
 	#'pop':  [ 69, 'd',	'$Mcode[$PC]+= 7<<3; # sp' ],
     #   modify above code as below:
-    'pop':  [ 69, 'd',	'$Mcode[$PC]+= 7<<3; # sp' ],
+    'pop':  [ 69, 'd',	'Mcode[PC]+= 7<<3; # sp' ],
 	'move': [ 70, 'ds'  ],
 	'clr':  [ 71, 's'   ],
 	'neg':  [ 72, 's'   ],
@@ -207,7 +207,7 @@ def pre_process(contents):
                     if matches:
                         arg = arg[matches.end():] # from the end of leading text to the end of original string
                         arg = int(arg)            # convert the string to int for later calculating
-                    Mcode[PC] += (arg & 7)
+                    Mcode[PC] += (arg & 7) << 3
                 # T-reg
                 elif arg_type is 't':
                     # Lose leading text
@@ -323,13 +323,11 @@ def pre_process(contents):
     
     file.write('The machine code:\n')
     for i in range(0, len(Mcode)):
-    	# assign the value of Mcode to 'M_code' which is to be output
         M_code = Mcode[i]
         # the number of bits in the format may be needed to be modified:
         print 'the type of this Mcode is:', type(M_code)
         print 'the Mcode is:', Mcode
         print 'i == ', i
-        # use buffer here to convert M_code into hexadecimal number
         buf = "%04x" %(M_code)
         # Mcode = format(Mcode, '04x')
         file.write(buf+' ')
