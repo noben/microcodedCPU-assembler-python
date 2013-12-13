@@ -10,91 +10,91 @@ import sys
 #   Table of opcode names, the values and their arguments
 #   A hash table implemented with dictionary
 Opcode = {
-	'add':  [ 0, 'dst'  ],
-	'sub':  [ 1, 'dst'  ],
-	'mul':  [ 2, 'dst'  ],
-	'div':  [ 3, 'dst'  ],
-	'rem':  [ 4, 'dst'  ],
-	'and':  [ 5, 'dst'  ],
-	'or':   [ 6, 'dst'  ],
-	'xor':  [ 7, 'dst'  ],
-	'nand': [ 8, 'dst'  ],
-	'nor':  [ 9, 'dst'  ],
-	'not':  [ 10, 'ds'  ],
-	'lsl':  [ 11, 'dst' ],
-	'lsr':  [ 12, 'dst' ],
-	'asr':  [ 13, 'dst' ],
-	'rol':  [ 14, 'dst' ],
-	'ror':  [ 15, 'dst' ],
-	'addi': [ 16, 'dsi' ],
-	'subi': [ 17, 'dsi' ],
-	'muli': [ 18, 'dsi' ],
-	'divi': [ 19, 'dsi' ],
-	'remi': [ 20, 'dsi' ],
-	'andi': [ 21, 'dsi' ],
-	'ori':  [ 22, 'dsi' ],
-	'xori': [ 23, 'dsi' ],
-	'nandi':[ 24, 'dsi' ],
-	'nori': [ 25, 'dsi' ],
-	'lsli': [ 26, 'dsi' ],
-	'lsri': [ 27, 'dsi' ],
-	'asri': [ 28, 'dsi' ],
-	'roli': [ 29, 'dsi' ],
-	'rori': [ 30, 'dsi' ],
-	'addc': [ 31, 'dstI'],
-	'subc': [ 32, 'dstI'],
-	'jeq':  [ 33, 'sti' ],
-	'jne':  [ 34, 'sti' ],
-	'jgt':  [ 35, 'sti' ],
-	'jle':  [ 36, 'sti' ],
-	'jlt':  [ 37, 'sti' ],
-	'jge':  [ 38, 'sti' ],
-	'jeqz': [ 39, 'si'  ],
-	'jnez': [ 40, 'si'  ],
-	'jgtz': [ 41, 'si'  ],
-	'jlez': [ 42, 'si'  ],
-	'jltz': [ 43, 'si'  ],
-	'jgez': [ 44, 'si'  ],
-	'jmp':  [ 45, 'i'   ],
-	'beq':  [ 46, 'stI' ],
-	'bne':  [ 47, 'stI' ],
-	'bgt':  [ 48, 'stI' ],
-	'ble':  [ 49, 'stI' ],
-	'blt':  [ 50, 'stI' ],
-	'bge':  [ 51, 'stI' ],
-	'beqz': [ 52, 'sI'  ],
-	'bnez': [ 53, 'sI'  ],
-	'bgtz': [ 54, 'sI'  ],
-	'blez': [ 55, 'sI'  ],
-	'bltz': [ 56, 'sI'  ],
-	'bgez': [ 57, 'sI'  ],
-	'br':   [ 58, 'I'   ],
+        'add':  [ 0, 'dst'  ],
+        'sub':  [ 1, 'dst'  ],
+        'mul':  [ 2, 'dst'  ],
+        'div':  [ 3, 'dst'  ],
+        'rem':  [ 4, 'dst'  ],
+        'and':  [ 5, 'dst'  ],
+        'or':   [ 6, 'dst'  ],
+        'xor':  [ 7, 'dst'  ],
+        'nand': [ 8, 'dst'  ],
+        'nor':  [ 9, 'dst'  ],
+        'not':  [ 10, 'ds'  ],
+        'lsl':  [ 11, 'dst' ],
+        'lsr':  [ 12, 'dst' ],
+        'asr':  [ 13, 'dst' ],
+        'rol':  [ 14, 'dst' ],
+        'ror':  [ 15, 'dst' ],
+        'addi': [ 16, 'dsi' ],
+        'subi': [ 17, 'dsi' ],
+        'muli': [ 18, 'dsi' ],
+        'divi': [ 19, 'dsi' ],
+        'remi': [ 20, 'dsi' ],
+        'andi': [ 21, 'dsi' ],
+        'ori':  [ 22, 'dsi' ],
+        'xori': [ 23, 'dsi' ],
+        'nandi':[ 24, 'dsi' ],
+        'nori': [ 25, 'dsi' ],
+        'lsli': [ 26, 'dsi' ],
+        'lsri': [ 27, 'dsi' ],
+        'asri': [ 28, 'dsi' ],
+        'roli': [ 29, 'dsi' ],
+        'rori': [ 30, 'dsi' ],
+        'addc': [ 31, 'dstI'],
+        'subc': [ 32, 'dstI'],
+        'jeq':  [ 33, 'sti' ],
+        'jne':  [ 34, 'sti' ],
+        'jgt':  [ 35, 'sti' ],
+        'jle':  [ 36, 'sti' ],
+        'jlt':  [ 37, 'sti' ],
+        'jge':  [ 38, 'sti' ],
+        'jeqz': [ 39, 'si'  ],
+        'jnez': [ 40, 'si'  ],
+        'jgtz': [ 41, 'si'  ],
+        'jlez': [ 42, 'si'  ],
+        'jltz': [ 43, 'si'  ],
+        'jgez': [ 44, 'si'  ],
+        'jmp':  [ 45, 'i'   ],
+        'beq':  [ 46, 'stI' ],
+        'bne':  [ 47, 'stI' ],
+        'bgt':  [ 48, 'stI' ],
+        'ble':  [ 49, 'stI' ],
+        'blt':  [ 50, 'stI' ],
+        'bge':  [ 51, 'stI' ],
+        'beqz': [ 52, 'sI'  ],
+        'bnez': [ 53, 'sI'  ],
+        'bgtz': [ 54, 'sI'  ],
+        'blez': [ 55, 'sI'  ],
+        'bltz': [ 56, 'sI'  ],
+        'bgez': [ 57, 'sI'  ],
+        'br':   [ 58, 'I'   ],
     #   the below code need to be modified
-	#   'jsr':  [ 59, 'i',	'$Mcode[$PC]+= 7<<3; # sp' ],
+        #   'jsr':  [ 59, 'i',        '$Mcode[$PC]+= 7<<3; # sp' ],
     #   modify above code as below: 
-    'jsr':  [ 59, 'i',	'Mcode[PC]+= 7<<3; # sp' ],
-	#   'rts':  [ 60, '', 	'$Mcode[$PC]+= 7<<3; # sp' ],
+    'jsr':  [ 59, 'i',        '$Mcode[$PC]+= 7<<3; # sp' ],
+        #   'rts':  [ 60, '',         '$Mcode[$PC]+= 7<<3; # sp' ],
     #   modify above code as below: 
-    'rts':  [ 60, '', 	'Mcode[PC]+= 7<<3; # sp' ],
-	'inc':  [ 61, 's'   ],
-	'dec':  [ 62, 's'   ],
-	'li':   [ 63, 'di'  ],
-	'lw':   [ 64, 'di'  ],
-	'sw':   [ 65, 'di'  ],
-	'lwi':  [ 66, 'dX'  ],
-	'swi':  [ 67, 'dX'  ],
+    'rts':  [ 60, '',         '$Mcode[$PC]+= 7<<3; # sp' ],
+        'inc':  [ 61, 's'   ],
+        'dec':  [ 62, 's'   ],
+        'li':   [ 63, 'di'  ],
+        'lw':   [ 64, 'di'  ],
+        'sw':   [ 65, 'di'  ],
+        'lwi':  [ 66, 'dX'  ],
+        'swi':  [ 67, 'dX'  ],
     #   the below code need to be modified
-	#'push': [ 68, 'd',	'$Mcode[$PC]+= 7<<3; # sp' ],
+        #'push': [ 68, 'd',        '$Mcode[$PC]+= 7<<3; # sp' ],
     #   modify above code as below:
-    'push': [ 68, 'd',	'Mcode[PC]+= 7<<3; # sp' ],
-	#'pop':  [ 69, 'd',	'$Mcode[$PC]+= 7<<3; # sp' ],
+    'push': [ 68, 'd',        '$Mcode[$PC]+= 7<<3; # sp' ],
+        #'pop':  [ 69, 'd',        '$Mcode[$PC]+= 7<<3; # sp' ],
     #   modify above code as below:
-    'pop':  [ 69, 'd',	'Mcode[PC]+= 7<<3; # sp' ],
-	'move': [ 70, 'ds'  ],
-	'clr':  [ 71, 's'   ],
-	'neg':  [ 72, 's'   ],
-	'lwri': [ 73, 'dS' ],
-	'swri': [ 74, 'dS' ],
+    'pop':  [ 69, 'd',        '$Mcode[$PC]+= 7<<3; # sp' ],
+        'move': [ 70, 'ds'  ],
+        'clr':  [ 71, 's'   ],
+        'neg':  [ 72, 's'   ],
+        'lwri': [ 73, 'dS' ],
+        'swri': [ 74, 'dS' ],
 }
 
 Label = {}  # declare Hash of label -> PC values as a dictionary
@@ -144,7 +144,7 @@ def pre_process(contents):
                 # if it is the label line, the newline should be trimed off the label -> then it can be splitted to op and arg
                 newline = matches.group(2)
                 
-            # currently the 'newline' is in the form of 'li	r1, 100'
+            # currently the 'newline' is in the form of 'li        r1, 100'
             # split the line into opcode and arguments, putting into a list of two elements (opcode and arguments)
             opcode_arg_list = re.split('\s+', newline, 1)
             print 'the opcode and arg list is: ', opcode_arg_list
@@ -161,7 +161,7 @@ def pre_process(contents):
             # now the 'opcode_arg_list' is in the form of '['li', 'r1, 100']'
             # Fill in the opcode of the machine instruction
             print "---------the type of opcode is-------------:", type(opcode)
-            Mcode[PC] = Opcode[opcode][0] << 9 # shift 3 regs
+            Mcode[PC] = Opcode[opcode][0] <<16  # shift 3 regs
                 
             # Run any code associated with this instruction [i think it makes no sense to run 'eval' here]
             # eval($Opcode{$opcode}->[2]) if (defined($Opcode{$opcode}->[2]));
@@ -190,7 +190,7 @@ def pre_process(contents):
                     if matches:
                         arg = arg[matches.end():] # from the end of leading text to the end of original string
                         arg = int(arg)            # convert the string to int for later calculating
-                    Mcode[PC] += (arg & 7)
+                    Mcode[PC] += (arg & 31)
                 # D-reg, S-reg is D-reg
                 elif arg_type is 'D':
                     # Lose leading text
@@ -198,8 +198,8 @@ def pre_process(contents):
                     if matches:
                         arg = arg[matches.end():] # from the end of leading text to the end of original string
                         arg = int(arg)            # convert the string to int for later calculating
-                    Mcode[PC] += (arg & 7)
-                    Mcode[PC] += (arg & 7) << 3
+                    Mcode[PC] += (arg & 31)
+                    Mcode[PC] += (arg & 31) << 5
                 # S-reg
                 elif arg_type is 's':
                     # Lose leading text
@@ -207,7 +207,7 @@ def pre_process(contents):
                     if matches:
                         arg = arg[matches.end():] # from the end of leading text to the end of original string
                         arg = int(arg)            # convert the string to int for later calculating
-                    Mcode[PC] += (arg & 7) << 3
+                    Mcode[PC] += (arg & 31)<<5
                 # T-reg
                 elif arg_type is 't':
                     # Lose leading text
@@ -215,7 +215,7 @@ def pre_process(contents):
                     if matches:
                         arg = arg[matches.end():] # from the end of leading text to the end of original string
                         arg = int(arg)            # convert the string to int for later calculating
-                    Mcode[PC] += (arg & 7) << 6
+                    Mcode[PC] += (arg & 31) << 10
                 # Absolute immediate
                 elif arg_type is 'i':
                     # Deal with hex values - judge if the value arg is a hex by looking if it is start with '0x'
@@ -311,7 +311,7 @@ def pre_process(contents):
             label = label - i
         # Save the final value:
         label = int(label)
-        Mcode[i] = label & 0xffff
+        Mcode[i] = label & 0xffffffff
         
 # print machine code in hex for now
     for i in range(0, len(Mcode)):
@@ -321,14 +321,22 @@ def pre_process(contents):
     print "Writing to '.ram' file..."
     file = open('program_luming.ram', 'w+') # 'w+', cover the original file
     
-    file.write('The machine code:\n')
+    file.write('v2.0 raw\n')
     for i in range(0, len(Mcode)):
+            # assign the value of Mcode to 'M_code' which is to be output
         M_code = Mcode[i]
         # the number of bits in the format may be needed to be modified:
         print 'the type of this Mcode is:', type(M_code)
         print 'the Mcode is:', Mcode
         print 'i == ', i
-        buf = "%04x" %(M_code)
+        # use buffer here to convert M_code into hexadecimal number
+        #if (str)(M_Code) == 'ffff':
+        #    'fffffffff'
+        if M_code < 0:
+            buf = "ffff%x" %(M_code)
+        else:    
+            buf = "%x" %(M_code)
+        
         # Mcode = format(Mcode, '04x')
         file.write(buf+' ')
         if i%8 == 7:
@@ -340,8 +348,9 @@ def pre_process(contents):
     
 #   input file from command line
 #   open and read the input file which is the assembling language
-IN = sys.argv[-1]
-f = open(IN, "rb")
+#IN = sys.argv[-1]
+#f = open(IN, "rb")
+f=open('basic_program.s','rb')
 contents = f.read()
         
         
@@ -354,14 +363,3 @@ def main():
 if __name__ == '__main__':
     main()
     
-
-
-
-
-
-
-
-
-
-
-
